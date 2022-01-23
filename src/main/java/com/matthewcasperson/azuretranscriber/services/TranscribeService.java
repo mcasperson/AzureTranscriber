@@ -27,7 +27,7 @@ public class TranscribeService {
   @Value("${speechServiceRegion}")
   private String speechServiceRegion;
 
-  public String transcribe(final MultipartFile file)
+  public String transcribe(final MultipartFile file, final String language)
       throws IOException, ExecutionException, InterruptedException {
     Path audioFile = null;
     try {
@@ -35,13 +35,14 @@ public class TranscribeService {
 
       try (SpeechTranslationConfig config = SpeechTranslationConfig.fromSubscription(
           speechSubscriptionKey, speechServiceRegion)) {
-        PullAudioInputStream pullAudio = PullAudioInputStream.create(
+        config.setSpeechRecognitionLanguage(language);
+        final PullAudioInputStream pullAudio = PullAudioInputStream.create(
             new BinaryAudioStreamReader(audioFile.toString()),
             AudioStreamFormat.getCompressedFormat(AudioStreamContainerFormat.ANY));
-        AudioConfig audioConfig = AudioConfig.fromStreamInput(pullAudio);
-        SpeechRecognizer reco = new SpeechRecognizer(config, audioConfig);
-        Future<SpeechRecognitionResult> task = reco.recognizeOnceAsync();
-        SpeechRecognitionResult result = task.get();
+        final AudioConfig audioConfig = AudioConfig.fromStreamInput(pullAudio);
+        final SpeechRecognizer reco = new SpeechRecognizer(config, audioConfig);
+        final Future<SpeechRecognitionResult> task = reco.recognizeOnceAsync();
+        final SpeechRecognitionResult result = task.get();
         return result.getText();
       }
     } catch (final Exception ex) {
