@@ -14,10 +14,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class TranslateService {
 
-  @Value("${speechSubscriptionKey}")
+  @Value("${translatorSubscriptionKey}")
   private String speechSubscriptionKey;
 
-  @Value("${speechServiceRegion}")
+  @Value("${translatorServiceRegion}")
   private String speechServiceRegion;
 
   public String translate(final String input, final String sourceLanguage,
