@@ -59,7 +59,7 @@ public class TranscribeService {
   }
 
   Path saveFileToDisk(final MultipartFile file) throws IOException {
-    final Path tempFile = Files.createTempFile("", ".wav");
+    final Path tempFile = Files.createTempFile("", ".webm");
     file.transferTo(tempFile);
     return tempFile;
   }
