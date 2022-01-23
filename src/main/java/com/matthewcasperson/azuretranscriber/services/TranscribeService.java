@@ -1,9 +1,14 @@
 package com.matthewcasperson.azuretranscriber.services;
 
+import com.matthewcasperson.azuretranscriber.readers.BinaryAudioStreamReader;
 import com.microsoft.cognitiveservices.speech.SpeechRecognitionResult;
 import com.microsoft.cognitiveservices.speech.SpeechRecognizer;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
+import com.microsoft.cognitiveservices.speech.audio.AudioStreamContainerFormat;
+import com.microsoft.cognitiveservices.speech.audio.AudioStreamFormat;
+import com.microsoft.cognitiveservices.speech.audio.PullAudioInputStream;
 import com.microsoft.cognitiveservices.speech.translation.SpeechTranslationConfig;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,12 +19,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.microsoft.cognitiveservices.speech.*;
+import com.microsoft.cognitiveservices.speech.audio.*;
+
 @Service
 public class TranscribeService {
-  @Value("speechSubscriptionKey")
+
+  @Value("${speechSubscriptionKey}")
   private String speechSubscriptionKey;
 
-  @Value("speechServiceRegion")
+  @Value("${speechServiceRegion}")
   private String speechServiceRegion;
 
   public String transcribe(final MultipartFile file, final String language)
@@ -30,14 +39,18 @@ public class TranscribeService {
 
       try (SpeechTranslationConfig config = SpeechTranslationConfig.fromSubscription(
           speechSubscriptionKey, speechServiceRegion)) {
-        config.setSpeechRecognitionLanguage(language);
-        AudioConfig audioConfig = AudioConfig.fromWavFileInput(audioFile.toString());
-        SpeechRecognizer recognizer = new SpeechRecognizer(config, audioConfig);
-
-        Future<SpeechRecognitionResult> task = recognizer.recognizeOnceAsync();
+        PullAudioInputStream pullAudio = PullAudioInputStream.create(
+            new BinaryAudioStreamReader(audioFile.toString()),
+            AudioStreamFormat.getCompressedFormat(AudioStreamContainerFormat.ANY));
+        AudioConfig audioConfig = AudioConfig.fromStreamInput(pullAudio);
+        SpeechRecognizer reco = new SpeechRecognizer(config, audioConfig);
+        Future<SpeechRecognitionResult> task = reco.recognizeOnceAsync();
         SpeechRecognitionResult result = task.get();
         return result.getText();
       }
+    } catch (final Exception ex) {
+      System.out.println(ex);
+      throw ex;
     } finally {
       if (audioFile != null) {
         FileUtils.deleteQuietly(audioFile.toFile());

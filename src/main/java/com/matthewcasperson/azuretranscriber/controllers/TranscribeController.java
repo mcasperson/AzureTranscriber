@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ public class TranscribeController {
   TranscribeService transcribeService;
 
   @PostMapping("/recordings")
+  @CrossOrigin()
   public String transcribe(
       @RequestParam("file") final MultipartFile file,
       @RequestParam("language") final String language)
