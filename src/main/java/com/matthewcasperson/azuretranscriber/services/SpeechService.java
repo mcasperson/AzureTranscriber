@@ -21,12 +21,12 @@ public class SpeechService {
   @Value("${speechServiceRegion}")
   private String speechServiceRegion;
 
-  public byte[] translateText(final String input) throws IOException {
+  public byte[] translateText(final String input, final String targetLanguage) throws IOException {
     final Path tempFile = Files.createTempFile("", ".wav");
 
     try (SpeechConfig speechConfig = SpeechConfig.fromSubscription(speechSubscriptionKey,
         speechServiceRegion)) {
-      // set the output format
+      speechConfig.setSpeechSynthesisLanguage(targetLanguage);
       speechConfig.setSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm);
 
       SpeechSynthesizer synthesizer = new SpeechSynthesizer(speechConfig, null);
