@@ -27,7 +27,7 @@ public class TranscribeService {
   @Value("${speechServiceRegion}")
   private String speechServiceRegion;
 
-  public String transcribe(final MultipartFile file, final String language)
+  public String transcribe(final MultipartFile file)
       throws IOException, ExecutionException, InterruptedException {
     Path audioFile = null;
     try {

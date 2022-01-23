@@ -11,9 +11,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@Controller
+@RestController
 public class TranscribeController {
 
   @Autowired
@@ -22,9 +23,8 @@ public class TranscribeController {
   @PostMapping("/recordings")
   @CrossOrigin()
   public String transcribe(
-      @RequestParam("file") final MultipartFile file,
-      @RequestParam("language") final String language)
+      @RequestParam("file") final MultipartFile file)
       throws IOException, ExecutionException, InterruptedException {
-    return transcribeService.transcribe(file, language);
+    return transcribeService.transcribe(file);
   }
 }
